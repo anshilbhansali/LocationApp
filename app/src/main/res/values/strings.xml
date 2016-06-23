@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">LocationApp</string>
+    <string name="title_activity_maps">Map</string>
+    <string-array name="drawer_array">
+        <item>Home</item>
+        <item>Preferences</item>
+        <item>Privacy Policy</item>
+        <item>Log Out</item>
+    </string-array>
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+    <string name="facebook_app_id">1715385288730862</string>
+    <string name="fb_login_protocol_scheme">fb1715385288730862</string>
+</resources>
