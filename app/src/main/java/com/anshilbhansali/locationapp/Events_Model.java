@@ -13,7 +13,7 @@ public class Events_Model {
     public Events_Model()
     {
         //INIT
-        User_events = new ArrayList<Event>();
+        User_events = new ArrayList<>();
     }
 
     void add_event(Event event)
@@ -30,4 +30,16 @@ public class Events_Model {
             User_events.get(i).print_event();
         }
     }
+
+    int getSize()
+    {
+        return User_events.size();
+    }
+
+    Event get_event(int i)
+    {
+        return User_events.get(i);
+    }
+
+
 }

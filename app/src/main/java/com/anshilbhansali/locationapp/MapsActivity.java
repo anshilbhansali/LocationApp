@@ -57,6 +57,8 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private SeekBar seekBar;
     private TextView current_day, future_day;
 
+    //model
+    Events_Model model;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,8 +151,6 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
             }
         });
 
-        //get events
-        FB_Events fb_events = new FB_Events();
 
     }
 
@@ -209,14 +209,17 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 == PackageManager.PERMISSION_GRANTED) {
             mMap.setMyLocationEnabled(true);
         } else {
-            // Show rationale and request permission.
+            Toast.makeText(MapsActivity.this, "We need to access your location", Toast.LENGTH_SHORT).show();
         }
 
+        //will retrieve events from FB, and add to Map
+        FB_Events fb_events = new FB_Events(mMap, this);
+
+
         LatLng champaign = new LatLng(40.11, -88.24);
-        mMap.addMarker(new MarkerOptions().position(champaign).title("Marker in Sydney"));
+        mMap.addMarker(new MarkerOptions().position(champaign).title("UIUC"));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(champaign));
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(champaign, 15));
-
 
     }
 
@@ -231,6 +234,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             // Highlight the selected item, update the title, and close the drawer
+
             if(position == 3)
             {
                 //Log out

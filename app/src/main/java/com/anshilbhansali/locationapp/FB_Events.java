@@ -1,11 +1,16 @@
 package com.anshilbhansali.locationapp;
 
+import android.app.Activity;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
 import com.facebook.HttpMethod;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,9 +23,14 @@ import org.json.JSONObject;
 public class FB_Events {
 
     String user_id;
+    Events_Model model;
+    private GoogleMap mMap;
+    Activity activity;
 
-    public FB_Events()
+    public FB_Events(GoogleMap mMap, Activity activity)
     {
+        this.mMap = mMap;
+        this.activity = activity;
 
         if(AccessToken.getCurrentAccessToken() != null)
         {
@@ -59,7 +69,7 @@ public class FB_Events {
 
     void parse_events(JSONObject jsonObject)
     {
-        Events_Model model = new Events_Model();
+        model = new Events_Model();
 
         JSONArray data_array = null;
 
@@ -103,18 +113,12 @@ public class FB_Events {
 
 
                 //SET null strings to "#" to prevent exceptions
-                if(desc == null)
-                    desc = "#";
-                if(name == null)
-                    name = "#";
-                if(id == null)
-                    id = "#";
-                if(start_time == null)
-                    start_time = "#";
-                if(end_time == null)
-                    end_time = "#";
-                if(status == null)
-                    status = "#";
+                desc = check_null(desc);
+                name = check_null(name);
+                id = check_null(id);
+                start_time = check_null(start_time);
+                end_time = check_null(end_time);
+                status = check_null(status);
 
                 Log.d("Facebook-events ", "EVENT NAME: " + name);
                 Log.d("Facebook-events ", "EVENT DESC: " + desc);
@@ -131,7 +135,9 @@ public class FB_Events {
 
             }
 
+
             model.print_all();
+            add_events_to_map();
 
         } catch (JSONException e) {
             e.printStackTrace();
@@ -145,5 +151,29 @@ public class FB_Events {
 
         return s;
     }
+
+    Events_Model getModel()
+    {
+        return model;
+    }
+
+    void add_events_to_map()
+    {
+        if(model.getSize() == 0)
+            Toast.makeText(activity, "Could not retrieve your events", Toast.LENGTH_SHORT).show();
+
+        //add events on map from model
+        for(int i=0; i< model.getSize() ; i++)
+        {
+            Event e = model.get_event(i);
+            if(e.getLat() != 0 && e.getLong() != 0)
+            {
+                LatLng location = new LatLng(e.getLat(), e.getLong());
+                String name = e.getName();
+                mMap.addMarker(new MarkerOptions().position(location).title(name));
+            }
+        }
+    }
+
 
 }
