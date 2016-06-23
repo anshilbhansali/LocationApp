@@ -16,13 +16,22 @@ public class Event {
     private String end_time;
     private String id;
     private String status;
-    private String ppl_going;
+
+    private int attending, interested;
 
     private double Lat, Long;
 
 
-    public Event(String name, String description, JSONObject place, String start_time, String end_time, String id, String status)
+    public Event(String name, String description, JSONObject place, String start_time, String end_time, String id, String status, int attending, int interested)
     {
+
+        //init
+        this.Lat = 0;
+        this.Long = 0;
+        this.attending = 0;
+        this.interested = 0;
+
+
         this.name = name;
         this.description = description;
         this.place = place;
@@ -30,10 +39,10 @@ public class Event {
         this.end_time = end_time;
         this.id = id;
         this.status = status;
+        this.attending = attending;
+        this.interested = interested;
 
-        //init
-        Lat = 0;
-        Long = 0;
+
 
         //extract latitude and longitude from place
         if(place != null)
@@ -69,7 +78,9 @@ public class Event {
         Log.d("FACEBOOK ", "EVENT START: " + start_time);
         Log.d("FACEBOOK ", "EVENT STATUS: " + status);
         Log.d("FACEBOOK ", "EVENT END: " + end_time);
-        Log.d("FACEBOOK ", "EVENT PPL GOING: " + ppl_going);
+        Log.d("Facebook-events ", "EVENT ATTENDING: " + Integer.toString(attending));
+        Log.d("Facebook-events ", "EVENT INTERESTED: " + Integer.toString(interested));
+
     }
 
     public double getLat() {

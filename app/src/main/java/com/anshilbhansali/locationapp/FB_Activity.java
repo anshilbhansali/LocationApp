@@ -10,9 +10,13 @@ import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
+
+import org.json.JSONObject;
 
 /**
  * Created by anshilbhansali on 6/21/16.
@@ -23,7 +27,6 @@ public class FB_Activity extends Activity {
 
     private CallbackManager callbackManager;
 
-    private LoginManager loginManager; //use to log out
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +43,7 @@ public class FB_Activity extends Activity {
         boolean loggedIn = AccessToken.getCurrentAccessToken() != null;
         if(loggedIn)
         {
+            getUserInfo(AccessToken.getCurrentAccessToken());
             Intent intent = new Intent(FB_Activity.this, MapsActivity.class);
             startActivity(intent);
         }
@@ -51,6 +55,8 @@ public class FB_Activity extends Activity {
                         "User ID: " + loginResult.getAccessToken().getUserId() + "\n" +
                                 "Auth Token: " + loginResult.getAccessToken().getToken()
                 );*/
+                getUserInfo(loginResult.getAccessToken());
+
                 Intent intent = new Intent(FB_Activity.this, MapsActivity.class);
                 startActivity(intent);
             }
@@ -66,6 +72,28 @@ public class FB_Activity extends Activity {
 
             }
         });
+
+    }
+
+    protected void getUserInfo(AccessToken accessToken){
+
+        GraphRequest data_request = GraphRequest.newMeRequest(
+                accessToken,
+                new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(
+                            JSONObject json_object,
+                            GraphResponse response) {
+
+                        Intent intent = new Intent(FB_Activity.this,MapsActivity.class);
+                        intent.putExtra("jsondata",json_object.toString());
+                        startActivity(intent);
+                    }
+                });
+        Bundle permission_param = new Bundle();
+        permission_param.putString("fields", "id,name,email,picture.width(120).height(120)");
+        data_request.setParameters(permission_param);
+        data_request.executeAsync();
 
     }
 

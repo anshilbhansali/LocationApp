@@ -86,6 +86,7 @@ public class FB_Events {
 
                 String id = null, start_time = null, end_time = null, status = null, desc = null, name = null;
                 JSONObject place = null;
+                int interested = 0, attending = 0;
 
                 //PARSE
 
@@ -110,6 +111,12 @@ public class FB_Events {
                 if(event.has("name"))
                     name = event.getString("name");
 
+                if(event.has("interested_count"))
+                    interested = event.getInt("interested_count");
+
+                if(event.has("attending_count"))
+                    attending = event.getInt("attending_count");
+
 
 
                 //SET null strings to "#" to prevent exceptions
@@ -120,16 +127,18 @@ public class FB_Events {
                 end_time = check_null(end_time);
                 status = check_null(status);
 
-                Log.d("Facebook-events ", "EVENT NAME: " + name);
+                /*Log.d("Facebook-events ", "EVENT NAME: " + name);
                 Log.d("Facebook-events ", "EVENT DESC: " + desc);
                 Log.d("Facebook-events ", "EVENT PLACE: " + place);
                 Log.d("Facebook-events ", "EVENT ID: " + id);
                 Log.d("Facebook-events ", "EVENT START: " + start_time);
                 Log.d("Facebook-events ", "EVENT STATUS: " + status);
                 Log.d("Facebook-events ", "EVENT END: " + end_time);
+                Log.d("Facebook-events ", "EVENT ATTENDING: " + Integer.toString(attending));
+                Log.d("Facebook-events ", "EVENT INTERESTED: " + Integer.toString(interested));*/
 
 
-                Event e = new Event(name, desc, place, start_time, end_time, id, status);
+                Event e = new Event(name, desc, place, start_time, end_time, id, status, attending, interested);
 
                 model.add_event(e);
 

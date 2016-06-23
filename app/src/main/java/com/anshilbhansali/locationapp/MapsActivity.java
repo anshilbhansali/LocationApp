@@ -14,12 +14,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SeekBar;
@@ -34,6 +36,11 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONObject;
+
+import de.hdodenhof.circleimageview.CircleImageView;
 
 public class MapsActivity extends AppCompatActivity implements OnMapReadyCallback {
 
@@ -46,6 +53,9 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     private ListView mDrawerList;
     private ActionBarDrawerToggle mDrawerToggle;
     private String mActivityTitle;
+    TextView user_name, user_email;
+    CircleImageView user_picture;
+    JSONObject response, profile_pic_data, profile_pic_url;
 
     //tab buttons
     Button map_button, feed_button;
@@ -86,6 +96,12 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerList = (ListView) findViewById(R.id.left_drawer);
         mActivityTitle = getTitle().toString();
+
+        //to put user profile pic into nav header
+        Intent intent = getIntent();
+        String jsondata = intent.getStringExtra("jsondata");
+        setNavigationHeader();    // call setNavigationHeader Method.
+        setUserProfile(jsondata);  // call setUserProfile Method.
 
         // Set the adapter for the list view
         mDrawerList.setAdapter(new ArrayAdapter<String>(this,
@@ -152,6 +168,42 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         });
 
 
+    }
+
+    public void setNavigationHeader(){
+
+
+        View header = LayoutInflater.from(this).inflate(R.layout.nav_header_home, null);
+        mDrawerList.addHeaderView(header);
+
+        user_name = (TextView) header.findViewById(R.id.username);
+        user_picture = (CircleImageView) header.findViewById(R.id.profile_pic);
+        user_email = (TextView) header.findViewById(R.id.email);
+    }
+
+    public  void  setUserProfile(String jsondata){
+
+        try {
+            response = new JSONObject(jsondata);
+            Log.d("RESPONSE#### ", "RESPONSE"+response);
+            if(response.has("email"))
+                user_email.setText(response.get("email").toString());
+            if(response.has("name"))
+                user_name.setText(response.get("name").toString());
+            if(response.has("picture"))
+            {
+                profile_pic_data = new JSONObject(response.get("picture").toString());
+                profile_pic_url = new JSONObject(profile_pic_data.getString("data"));
+
+                Picasso.with(this).load(profile_pic_url.getString("url"))
+                        .into(user_picture);
+            }
+
+
+
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     private void setupDrawer() {
@@ -234,8 +286,18 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         @Override
         public void onItemClick(AdapterView parent, View view, int position, long id) {
             // Highlight the selected item, update the title, and close the drawer
+            TextView v;
+            String s = " ";
 
-            if(position == 3)
+            if(view instanceof TextView)
+            {
+                v = (TextView) view;
+                s = (String) v.getText();
+            }
+
+            Log.d("DRAWER CLICK###", s);
+
+            if(s.equals("Log Out"))
             {
                 //Log out
                 LoginManager.getInstance().logOut();
@@ -243,7 +305,10 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
                 startActivity(intent);
             }
 
-            //Toast.makeText(MapsActivity.this, Integer.toString(position), Toast.LENGTH_SHORT).show();
+            if(s.equals("Preferences"))
+                Toast.makeText(MapsActivity.this, "Work in progress", Toast.LENGTH_SHORT).show();
+
+            //Toast.makeText(MapsActivity.this, Long.toString(id), Toast.LENGTH_SHORT).show();
             mDrawerList.setItemChecked(position, true);
             mDrawerLayout.closeDrawer(mDrawerList);
         }
